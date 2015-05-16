@@ -13,14 +13,15 @@ import android.widget.Toast;
 
 public class MainActivity extends FragmentActivity implements HeadlinesFragment.OnMenuSelectionListener {
 
-    private static final String TAG_HEADLINES_FRAGMENT = "HeadlinesFragment";
-    private static final String TAG_ARTICLE_FRAGMENT = "ArticleFragment";
-    private static final String KEY_PRE_NUM_PANES = "PreNumPanes";
-    public static final String KEY_CURR_MENU = "CurrMenu";
+    private static final String TAG_HEADLINES_FRAGMENT  = "HeadlinesFragment";
+    private static final String TAG_ARTICLE_FRAGMENT    = "ArticleFragment";
+    private static final String KEY_PRE_NUM_PANES       = "PreNumPanes";
+    public  static final String KEY_CURR_MENU           = "CurrMenu";
     private boolean mTwoPane;
     private int cMenuId;
     HeadlinesFragment headlinesFragment;
     ArticleFragment articleFragment;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,6 +29,14 @@ public class MainActivity extends FragmentActivity implements HeadlinesFragment.
         setContentView(R.layout.activity_main);
 
         FragmentManager fragmentManager = getSupportFragmentManager();
+        Log.i("Check","BackStack Count= "+fragmentManager.getBackStackEntryCount());
+        if (fragmentManager.getBackStackEntryCount()>0) {
+            fragmentManager.popBackStackImmediate();
+        }
+
+
+        Log.i("Check","BackStack Count= "+fragmentManager.getBackStackEntryCount());
+
         int numPanes = 0;
 
         if (savedInstanceState!=null) {
@@ -69,7 +78,7 @@ public class MainActivity extends FragmentActivity implements HeadlinesFragment.
                 fragmentManager.executePendingTransactions();
 
                 fragmentManager.beginTransaction()
-                        .add(R.id.article_fragment_container_twopane, articleFragment, TAG_ARTICLE_FRAGMENT)
+                        .add(R.id.article_fragment_container_twopane, articleFragment.newInstance(cMenuId), TAG_ARTICLE_FRAGMENT)
                         .commit();
                 fragmentManager.executePendingTransactions();
 
@@ -148,8 +157,12 @@ public class MainActivity extends FragmentActivity implements HeadlinesFragment.
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        if (!mTwoPane) {
-            Toast.makeText(getApplicationContext(), "Back Button pressed.", Toast.LENGTH_SHORT).show();
+        if (mTwoPane) {
+            //Toast.makeText(getApplicationContext(), "Back Button pressed.", Toast.LENGTH_SHORT).show();
+
+        } else {
+
+
         }
     }
 
@@ -173,6 +186,7 @@ public class MainActivity extends FragmentActivity implements HeadlinesFragment.
         } else {
             fragmentManager.beginTransaction()
                     .replace(R.id.main_fragment_container, articleFragment.newInstance(cMenuId), TAG_ARTICLE_FRAGMENT)
+                    .addToBackStack(null)
                     .commit();
             fragmentManager.executePendingTransactions();
 
